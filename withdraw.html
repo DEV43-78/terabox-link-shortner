@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Withdraw | ShortEarn</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f6fc;
+      padding: 80px 20px 40px;
+    }
+    .top-navbar {
+      background: #003973;
+      color: white;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .withdraw-box {
+      max-width: 600px;
+      margin: 100px auto 40px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .withdraw-methods button {
+      flex: 1;
+      padding: 12px;
+      background: #e0e7ff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .withdraw-methods button.active {
+      background: #003973;
+      color: white;
+      border-color: #003973;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    button.submit-btn {
+      padding: 12px 30px;
+      background: #0052cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .history-box {
+      margin-top: 30px;
+    }
+    .history-entry {
+      background: #f1f5ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    #loginOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #loginOverlay div {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div>
+    <h2>Session Expired</h2>
+    <p>Please login to continue.</p>
+    <button onclick="window.location.href='index.html'">Login Now</button>
+  </div>
+</div>
+
+<header class="top-navbar">
+  <div onclick="window.location.href='dashboard.html'">☰</div>
+  <div>ShortEarn</div>
+  <div onclick="window.location.href='profile.html'">👤</div>
+</header>
+
+<div class="withdraw-box" id="mainContent">
+  <h2>💸 Withdraw Your Earnings</h2>
+  <div class="withdraw-methods" style="display:flex; gap:10px; margin-bottom:20px;">
+    <button onclick="selectMethod('upi')" id="btn-upi">UPI</button>
+    <button onclick="selectMethod('bank')" id="btn-bank">Bank</button>
+    <button onclick="selectMethod('crypto')" id="btn-crypto">Crypto</button>
+  </div>
+
+  <p><strong>Total Available:</strong> ₹<span id="availableAmount">0</span></p>
+  <input type="number" id="withdrawAmount" placeholder="Enter amount to withdraw (Min ₹10)">
+  <div id="detailsSection" style="display:none;">
+    <textarea id="withdrawDetails" placeholder="Enter your UPI ID / Bank Details / Wallet Address"></textarea>
+    <button class="submit-btn" onclick="submitWithdraw()">Submit Withdrawal</button>
+  </div>
+
+  <div class="history-box">
+    <h3>🧾 Withdrawal History</h3>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { firebaseConfig } from "./config.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let selectedMethod = "";
+let currentUserId = "";
+let availableBalance = 0;
+
+const amountEl = document.getElementById("withdrawAmount");
+const availableAmountEl = document.getElementById("availableAmount");
+const historyList = document.getElementById("historyList");
+const detailsBox = document.getElementById("detailsSection");
+const loginOverlay = document.getElementById("loginOverlay");
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    loginOverlay.style.display = "flex";
+    return setTimeout(() => window.location.href = "index.html", 1500);
+  }
+
+  currentUserId = user.uid;
+
+  // ✅ Load total available balance
+  onValue(ref(db, `users/${currentUserId}/withdrawals/totalavailable`), (snap) => {
+    availableBalance = snap.exists() ? snap.val() : 0;
+    availableAmountEl.textContent = availableBalance;
+  });
+
+  // ✅ Load history
+  onValue(ref(db, `users/${currentUserId}/withdrawals/history`), (snap) => {
+    historyList.innerHTML = "";
+    if (snap.exists()) {
+      const data = Object.values(snap.val()).reverse();
+      data.forEach(entry => {
+        historyList.innerHTML += `
+          <div class="history-entry">
+            <strong>Method:</strong> ${entry.method.toUpperCase()}<br/>
+            <strong>Amount:</strong> ₹${entry.amount}<br/>
+            <strong>Date:</strong> ${entry.date}<br/>
+            <strong>Status:</strong> ${entry.status}
+          </div>
+        `;
+      });
+    } else {
+      historyList.innerHTML = "<p>No withdrawal history yet.</p>";
+    }
+  });
+});
+
+window.selectMethod = (method) => {
+  selectedMethod = method;
+  document.querySelectorAll(".withdraw-methods button").forEach(btn => btn.classList.remove("active"));
+  document.getElementById("btn-" + method).classList.add("active");
+
+  if (parseFloat(amountEl.value) >= 10) {
+    detailsBox.style.display = "block";
+  }
+};
+
+window.submitWithdraw = () => {
+  const amount = parseFloat(amountEl.value);
+  const details = document.getElementById("withdrawDetails").value.trim();
+
+  if (!selectedMethod) return alert("Please select a withdrawal method.");
+  if (!amount || amount < 10) return alert("Minimum withdrawal amount is ₹10.");
+  if (amount > availableBalance) return alert("Insufficient balance.");
+  if (!details) return alert("Please enter withdrawal details.");
+
+  const request = {
+    method: selectedMethod,
+    amount,
+    details,
+    status: "Pending",
+    date: new Date().toISOString().split("T")[0]
+  };
+
+  const historyRef = ref(db, `users/${currentUserId}/withdrawals/history`);
+  const balanceRef = ref(db, `users/${currentUserId}/withdrawals`);
+
+  // ✅ Push and Update
+  push(historyRef, request)
+    .then(() => {
+      const newBalance = availableBalance - amount;
+      update(balanceRef, { totalavailable: newBalance });
+      alert("Withdrawal request submitted!");
+      document.getElementById("withdrawAmount").value = "";
+      document.getElementById("withdrawDetails").value = "";
+      detailsBox.style.display = "none";
+    })
+    .catch(err => alert("Error: " + err.message));
+};
+
+amountEl.addEventListener("input", () => {
+  if (parseFloat(amountEl.value) >= 10 && selectedMethod) {
+    detailsBox.style.display = "block";
+  } else {
+    detailsBox.style.display = "none";
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,260 @@
+/* Reset & Global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f7fa;
+  color: #333;
+  line-height: 1.6;
+  scroll-behavior: smooth;
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(to right, #003973, #e5e5be);
+  padding: 1rem 2rem;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar .logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-links li a:hover {
+  border-bottom: 2px solid white;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  gap: 1rem;
+  background: #fff;
+}
+
+.auth-buttons .btn {
+  background: #0052cc;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.auth-buttons .btn:hover {
+  background: #003d99;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background: linear-gradient(to bottom, #fff, #eef2f7);
+}
+
+.hero h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+  color: #003973;
+}
+
+.hero p {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.shortener-box {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.shortener-box input {
+  padding: 12px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.shortener-box button {
+  background: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.shortener-box button:hover {
+  background: #218838;
+}
+
+/* CPM Section */
+.cpm-section {
+  background: #f0fff4;
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.cpm-section h2 {
+  color: #2f855a;
+  font-size: 28px;
+  margin-bottom: 15px;
+}
+
+.cpm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.cpm-grid div {
+  background: #ffffff;
+  border: 1px solid #c6f6d5;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.note {
+  font-size: 14px;
+  margin-top: 20px;
+  color: #555;
+}
+
+/* Content Boxes */
+.content-box {
+  max-width: 960px;
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.content-box h2 {
+  color: #1a202c;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.earnings-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.earnings-list li {
+  margin-bottom: 12px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.earnings-list li::before {
+  content: "💼";
+  position: absolute;
+  left: 0;
+}
+
+/* Footer */
+footer {
+  background: #1a202c;
+  color: white;
+  text-align: center;
+  padding: 30px 20px;
+  font-size: 15px;
+}
+
+footer a {
+  color: #90cdf4;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-box h2 {
+  margin-bottom: 10px;
+  color: #003973;
+}
+
+.modal-box p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-box .btn.full {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.footer-text {
+  margin-top: 15px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.footer-text a {
+  color: #0052cc;
+  text-decoration: none;
+}

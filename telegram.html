@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Telegram Bot | ShortEarn</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f6fc;
+      padding: 80px 20px 40px;
+    }
+    .top-navbar {
+      background: #003973;
+      color: white;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .menu-icon, .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .telegram-box {
+      max-width: 600px;
+      margin: 100px auto 40px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .telegram-box h2 {
+      color: #003973;
+      margin-bottom: 20px;
+    }
+    .telegram-box p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    .telegram-box a {
+      display: inline-block;
+      padding: 12px 30px;
+      background: #0052cc;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    .telegram-box a:hover {
+      background: #003999;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="logo">ShortEarn</div>
+    <div class="profile-icon" onclick="goToProfile()">👤</div>
+  </header>
+
+  <div class="telegram-box">
+    <h2>🤖 Connect to Telegram Bot</h2>
+    <p>Use our Telegram bot to generate short links, monitor stats, and get instant updates on earnings.</p>
+    <a href="https://t.me/ShortEarnBot" target="_blank">Connect to Bot</a>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      window.location.href = 'dashboard.html';
+    }
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+  </script>
+</body>
+</html>

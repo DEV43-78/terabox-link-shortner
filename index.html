@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShortEarn - Smart Link Shortener</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ Only include module script once -->
+  <script type="module" src="script.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">ShortEarn</div>
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#cpm">CPM</a></li>
+      <li><a href="#privacy">Privacy</a></li>
+      <li><a href="#earnings">Earnings</a></li>
+    </ul>
+  </nav>
+
+  <!-- Auth Buttons -->
+<div class="auth-buttons">
+  <button class="btn login-btn" onclick="openLogin()" id="loginBtn">Login</button>
+  <button class="btn signup-btn" onclick="openSignup()" id="signupBtn">Sign Up</button>
+</div>
+
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-box">
+      <h2>Welcome Back 👋</h2>
+      <p>Login to your ShortEarn account</p>
+      <input type="email" id="loginEmail" placeholder="Email address" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button class="btn full" id="handleLoginBtn">Login</button>
+      <p class="footer-text">Don't have an account? <a href="#" id="switchToSignup">Sign Up</a></p>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div id="signupModal" class="modal hidden">
+    <div class="modal-box">
+      <h2>Create Account 🚀</h2>
+      <p>Join and start earning from shortened links</p>
+      <input type="text" id="signupName" placeholder="Full Name" />
+      <input type="email" id="signupEmail" placeholder="Email address" />
+      <input type="password" id="signupPassword" placeholder="Create Password" />
+      <button class="btn full" id="handleSignupBtn">Sign Up</button>
+      <p class="footer-text">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </div>
+  </div>
+
+
+  <!-- Hero + Shortener Section -->
+  <section class="hero">
+    <h1>Smart URL Shortener</h1>
+    <p>Shorten your links and earn from every visitor</p>
+    <div class="shortener-box">
+      <input type="text" id="linkInput" placeholder="Paste your long URL here..." />
+      <button onclick="shortenLink()">Shorten Now</button>
+    </div>
+  </section>
+
+   <!-- CPM Box -->
+ <section class="cpm-section" id="cpm">
+  <div class="container">
+    <h2>📊 Real-Time CPM Rates</h2>
+    <p>Our dynamic CPM system adjusts based on traffic, country & device.</p>
+    <div class="cpm-grid">
+      <div>🇺🇸 USA - ₹400</div><div>🇬🇧 UK - ₹380</div><div>🇨🇦 Canada - ₹350</div>
+      <div>🇦🇺 Australia - ₹330</div><div>🇩🇪 Germany - ₹310</div><div>🇫🇷 France - ₹300</div>
+      <div>🇮🇳 India - ₹250</div><div>🇧🇷 Brazil - ₹240</div><div>🇮🇹 Italy - ₹230</div>
+      <div>🇸🇬 Singapore - ₹320</div><div>🇰🇷 Korea - ₹300</div><div>🇯🇵 Japan - ₹310</div>
+      <div>🇲🇾 Malaysia - ₹260</div><div>🇵🇭 Philippines - ₹220</div><div>🇮🇩 Indonesia - ₹200</div>
+      <div>🇿🇦 South Africa - ₹180</div><div>🇷🇺 Russia - ₹270</div><div>🇲🇽 Mexico - ₹250</div>
+      <div>🇦🇪 UAE - ₹330</div><div>🇸🇦 Saudi Arabia - ₹300</div><div>🇪🇬 Egypt - ₹180</div>
+      <div>🇹🇷 Turkey - ₹210</div><div>🇻🇳 Vietnam - ₹190</div><div>🇹🇭 Thailand - ₹200</div>
+      <div>🇳🇬 Nigeria - ₹150</div><div>🇵🇰 Pakistan - ₹160</div><div>🇧🇩 Bangladesh - ₹170</div>
+      <div>🇳🇵 Nepal - ₹180</div><div>🇨🇭 Switzerland - ₹320</div><div>🇳🇱 Netherlands - ₹310</div>
+      <div>🇪🇸 Spain - ₹300</div><div>🇳🇴 Norway - ₹330</div><div>🇸🇪 Sweden - ₹320</div>
+      <div>🇧🇪 Belgium - ₹290</div><div>🇫🇮 Finland - ₹280</div><div>🇮🇪 Ireland - ₹270</div>
+      <div>🇦🇹 Austria - ₹275</div><div>🇨🇱 Chile - ₹240</div><div>🇦🇷 Argentina - ₹220</div>
+      <div>🇵🇹 Portugal - ₹230</div><div>🇮🇱 Israel - ₹310</div><div>🇭🇰 Hong Kong - ₹300</div>
+      <div>🇳🇿 New Zealand - ₹340</div><div>🇰🇪 Kenya - ₹160</div><div>🇨🇳 China - ₹280</div>
+      <div>🇶🇦 Qatar - ₹300</div><div>🇴🇲 Oman - ₹270</div><div>🇯🇴 Jordan - ₹260</div>
+      <div>🇬🇷 Greece - ₹250</div><div>🌍 Others - ₹200+</div>
+    </div>
+    <p class="note">Updated in real-time based on traffic performance.</p>
+  </div>
+</section>
+
+
+  <!-- Privacy Policy -->
+  <section id="privacy" class="content-box">
+  <h2>🔐 Privacy Policy</h2>
+  <p>
+    At ShortEarn, your privacy is our priority. We maintain the highest standards in handling personal data globally.
+    <br><br>
+    1. We collect only necessary data (e.g., email, IP) for improving services.
+    <br>2. We never share user data with 3rd parties without consent.
+    <br>3. Passwords are stored securely using industry-standard encryption.
+    <br>4. Your shortened links are private unless you choose to share.
+    <br>5. GDPR, CCPA, and other international compliance maintained.
+    <br>6. You can request account deletion anytime.
+    <br>7. No invasive tracking; only essential cookies used.
+    <br>8. Logs are retained for 30 days for security.
+    <br>9. Email communication only with user permission.
+    <br>10. We perform regular data security audits.
+    <br>11. Backups are encrypted and geographically distributed.
+    <br>12. Third-party ad services are restricted to safe partners.
+    <br>13. Child data is never knowingly collected.
+    <br>14. User-generated content is monitored for violations.
+    <br>15. Reports of abuse are taken seriously and acted on fast.
+    <br>16. Admin access is secured with 2FA.
+    <br>17. You retain full control over your account and links.
+    <br>18. Privacy dashboard available in user profile.
+    <br>19. Contact us for questions anytime.
+    <br>20. Policy updates will be notified via email and dashboard.
+  </p>
+</section>
+
+
+  <!-- Earningas Report -->
+  <section id="earnings" class="content-box">
+  <h2>💼 Global Top Earners</h2>
+  <ul class="earnings-list">
+    <li>🇮🇳 Ravi from India earned ₹42,000/month via YouTube traffic.</li>
+    <li>🇧🇩 Samia from Bangladesh made ₹31,000 with Telegram groups.</li>
+    <li>🇺🇸 John from USA crossed ₹60,000 sharing tech blog links.</li>
+    <li>🇵🇭 Paolo from Philippines earns ₹18,000 monthly with Facebook links.</li>
+    <li>🇧🇷 Bruno from Brazil earned ₹25,000 through meme pages.</li>
+    <li>🇬🇧 James from UK posted gaming walkthroughs earning ₹48,000.</li>
+    <li>🇨🇦 Emily promoted music videos and earned ₹34,000.</li>
+    <li>🇳🇬 Ayo from Nigeria shared WhatsApp links and made ₹12,000.</li>
+    <li>🇵🇰 Asad from Pakistan earned ₹22,000 from sports updates.</li>
+    <li>🌍 Thousands of others earn daily with ShortEarn.</li>
+  </ul>
+</section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a> |
+      <a href="#">Terms</a> |
+      <a href="#">Support</a>
+    </div>
+    <div class="social-links">
+      <a href="#">Facebook</a> |
+      <a href="#">Telegram</a> |
+      <a href="#">Instagram</a>
+    </div>
+    <p>© 2025 ShortEarn. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

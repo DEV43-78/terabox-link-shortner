@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile | ShortEarn</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f6fc;
+      padding: 80px 20px 40px;
+    }
+    .top-navbar {
+      background: #003973;
+      color: white;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .menu-icon, .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .profile-box {
+      max-width: 600px;
+      margin: 100px auto 40px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .profile-box h2 {
+      color: #003973;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .profile-box label {
+      display: block;
+      margin-bottom: 6px;
+      color: #444;
+      font-weight: bold;
+    }
+    .profile-box input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .profile-box button {
+      width: 100%;
+      padding: 12px;
+      background: #0052cc;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .profile-box button:hover {
+      background: #003999;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="logo">ShortEarn</div>
+    <div class="profile-icon" onclick="goToProfile()">👤</div>
+  </header>
+
+  <div class="profile-box">
+    <h2>👤 Profile Settings</h2>
+    <form onsubmit="updateProfile(); return false;">
+      <label for="name">Change Name</label>
+      <input type="text" id="name" placeholder="Enter new name" required />
+
+      <label for="password">Change Password</label>
+      <input type="password" id="password" placeholder="Enter new password" required />
+
+      <button type="submit">Update Profile</button>
+    </form>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      window.location.href = 'dashboard.html';
+    }
+
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+
+    function updateProfile() {
+      const name = document.getElementById('name').value;
+      const password = document.getElementById('password').value;
+      alert(`Profile Updated:\nName: ${name}\nPassword: ${'*'.repeat(password.length)}`);
+      // Add backend/Firebase update logic here
+    }
+  </script>
+</body>
+</html>

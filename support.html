@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support | ShortEarn</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f6fc;
+      padding: 80px 20px 40px;
+    }
+    .top-navbar {
+      background: #003973;
+      color: white;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .menu-icon, .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .support-box {
+      max-width: 600px;
+      margin: 100px auto 40px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .support-box h2 {
+      color: #003973;
+      margin-bottom: 20px;
+    }
+    .support-box p {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .support-box a {
+      color: #0052cc;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .support-box a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header class="top-navbar">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <div class="logo">ShortEarn</div>
+    <div class="profile-icon" onclick="goToProfile()">👤</div>
+  </header>
+
+  <div class="support-box">
+    <h2>📧 Contact Support</h2>
+    <p>Need help? Reach out to our support team anytime:</p>
+    <p><strong>Email:</strong> <a href="mailto:support@shortearn.com">support@shortearn.com</a></p>
+    <p><strong>Telegram:</strong> <a href="https://t.me/ShortEarnSupport" target="_blank">@ShortEarnSupport</a></p>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      window.location.href = 'dashboard.html';
+    }
+    function goToProfile() {
+      window.location.href = 'profile.html';
+    }
+  </script>
+</body>
+</html>

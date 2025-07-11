@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shorten Link | ShortEarn</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f6fc;
+    }
+    .top-navbar {
+      background: #003973;
+      color: white;
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo { font-size: 20px; font-weight: 600; }
+    .menu-icon, .profile-icon {
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .shorten-box {
+      max-width: 600px;
+      margin: 100px auto 40px;
+      background: #ffffff;
+      padding: 35px 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .shorten-box h2 {
+      font-size: 26px;
+      margin-bottom: 20px;
+      color: #003973;
+    }
+    .shorten-box input {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .shorten-box button {
+      background: #0052cc;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .shorten-box button:hover {
+      background: #003999;
+    }
+    .result-box {
+      margin-top: 20px;
+      background: #e6f0ff;
+      padding: 15px;
+      border-radius: 8px;
+      word-break: break-word;
+      display: none;
+      text-align: left;
+    }
+    .result-box a {
+      color: #003973;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    #loginOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+    #loginOverlay > div {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    @media (max-width: 640px) {
+      .shorten-box {
+        margin: 90px 15px 30px;
+        padding: 25px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔐 Overlay if not logged in -->
+  <div id="loginOverlay">
+    <div>
+      <h2>Login Required</h2>
+      <p>Please login to use the shortener.</p>
+      <button onclick="window.location.href='index.html'">Login</button>
+    </div>
+  </div>
+
+  <!-- ✅ Navbar -->
+  <header class="top-navbar">
+    <div class="menu-icon" onclick="goToDashboard()">☰</div>
+    <div class="logo">ShortEarn</div>
+    <div class="profile-icon" onclick="goToProfile()">👤</div>
+  </header>
+
+  <!-- ✅ Shortener UI -->
+  <div class="shorten-box" id="mainContent">
+    <h2>🔗 Shorten Your Long URL</h2>
+    <input type="text" id="longUrl" placeholder="Enter your long URL here...">
+    <button onclick="shortenUrl()">Shorten</button>
+    <div id="resultBox" class="result-box"></div>
+  </div>
+
+  <!-- ✅ Firebase Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { firebaseConfig } from "./config.js";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    const loginOverlay = document.getElementById("loginOverlay");
+    const mainContent = document.getElementById("mainContent");
+    const resultBox = document.getElementById("resultBox");
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        loginOverlay.style.display = "flex";
+        mainContent.style.filter = "blur(4px)";
+        setTimeout(() => window.location.href = "index.html", 1500);
+        return;
+      }
+      currentUser = user;
+    });
+
+    // ✅ Extract file ID from the given URL
+    function extractFileId(url) {
+      try {
+        const parts = url.split("/");
+        return parts.pop() || parts.pop(); // handles trailing slash
+      } catch {
+        return null;
+      }
+    }
+
+    // ✅ Main Shorten Logic
+    window.shortenUrl = () => {
+      const longUrl = document.getElementById("longUrl").value.trim();
+      resultBox.style.display = "none";
+
+      if (!longUrl) {
+        resultBox.style.display = 'block';
+        resultBox.style.color = 'red';
+        resultBox.textContent = 'Please enter a valid URL.';
+        return;
+      }
+
+      const fileId = extractFileId(longUrl);
+      if (!fileId) {
+        resultBox.style.display = 'block';
+        resultBox.style.color = 'red';
+        resultBox.textContent = 'Could not extract file ID.';
+        return;
+      }
+
+      const shortUrl = `https://teraboxlinke.com/a/${fileId}`;
+      const now = new Date();
+      const today = now.toISOString().split("T")[0];
+
+      const data = {
+        originalUrl: longUrl,
+        shortUrl,
+        fileId,
+        createdAt: now.toISOString(),
+        views: 0,
+        dailyViews: { [today]: 0 }
+      };
+
+      // Save globally
+      set(ref(db, `shortLinks/${fileId}`), data);
+
+      // Save under user
+      set(ref(db, `users/${currentUser.uid}/links/${fileId}`), data);
+
+      resultBox.style.display = "block";
+      resultBox.style.color = "#003973";
+      resultBox.innerHTML = `
+        <strong>Shortened URL:</strong><br>
+        <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+    };
+
+    // 🔄 Navigation
+    window.goToDashboard = () => window.location.href = 'dashboard.html';
+    window.goToProfile = () => window.location.href = 'profile.html';
+  </script>
+</body>
+</html>
