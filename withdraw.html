@@ -135,8 +135,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
+// ✅ Utility: convert email to Firebase-safe key
+function safeEmailKey(email) {
+  return email.replace(/\./g, "_");
+}
+
 let selectedMethod = "";
-let currentUserId = "";
+let currentUserEmailKey = "";
 let availableBalance = 0;
 
 const amountEl = document.getElementById("withdrawAmount");
@@ -151,29 +156,32 @@ onAuthStateChanged(auth, (user) => {
     return setTimeout(() => window.location.href = "index.html", 1500);
   }
 
-  currentUserId = user.uid;
+  currentUserEmailKey = safeEmailKey(user.email);
 
-  // ✅ Load total available balance
-  onValue(ref(db, `users/${currentUserId}/withdrawals/totalavailable`), (snap) => {
+  const basePath = `users/${currentUserEmailKey}/withdrawals`;
+
+  // ✅ Load available balance
+  onValue(ref(db, `${basePath}/totalavailable`), (snap) => {
     availableBalance = snap.exists() ? snap.val() : 0;
     availableAmountEl.textContent = availableBalance;
   });
 
-  // ✅ Load history
-  onValue(ref(db, `users/${currentUserId}/withdrawals/history`), (snap) => {
+  // ✅ Load withdrawal history
+  onValue(ref(db, `${basePath}/history`), (snap) => {
     historyList.innerHTML = "";
     if (snap.exists()) {
-      const data = Object.values(snap.val()).reverse();
-      data.forEach(entry => {
+      const data = Object.entries(snap.val()).reverse();
+      for (const [id, entry] of data) {
         historyList.innerHTML += `
           <div class="history-entry">
             <strong>Method:</strong> ${entry.method.toUpperCase()}<br/>
             <strong>Amount:</strong> ₹${entry.amount}<br/>
             <strong>Date:</strong> ${entry.date}<br/>
-            <strong>Status:</strong> ${entry.status}
+            <strong>Status:</strong> ${entry.status}<br/>
+            <details><summary>Details</summary><pre>${JSON.stringify(entry.details, null, 2)}</pre></details>
           </div>
         `;
-      });
+      }
     } else {
       historyList.innerHTML = "<p>No withdrawal history yet.</p>";
     }
@@ -192,29 +200,41 @@ window.selectMethod = (method) => {
 
 window.submitWithdraw = () => {
   const amount = parseFloat(amountEl.value);
-  const details = document.getElementById("withdrawDetails").value.trim();
+  const detailsRaw = document.getElementById("withdrawDetails").value.trim();
 
   if (!selectedMethod) return alert("Please select a withdrawal method.");
   if (!amount || amount < 10) return alert("Minimum withdrawal amount is ₹10.");
   if (amount > availableBalance) return alert("Insufficient balance.");
-  if (!details) return alert("Please enter withdrawal details.");
+  if (!detailsRaw) return alert("Please enter withdrawal details.");
+
+  let structuredDetails = detailsRaw;
+  if (selectedMethod === "upi") {
+    structuredDetails = { upi: detailsRaw };
+  } else if (selectedMethod === "bank") {
+    const parts = detailsRaw.split("\n");
+    structuredDetails = {
+      accountNumber: parts[0] || "",
+      ifsc: parts[1] || "",
+      name: parts[2] || ""
+    };
+  } else if (selectedMethod === "crypto") {
+    structuredDetails = { wallet: detailsRaw };
+  }
 
   const request = {
     method: selectedMethod,
     amount,
-    details,
+    details: structuredDetails,
     status: "Pending",
     date: new Date().toISOString().split("T")[0]
   };
 
-  const historyRef = ref(db, `users/${currentUserId}/withdrawals/history`);
-  const balanceRef = ref(db, `users/${currentUserId}/withdrawals`);
+  const basePath = `users/${currentUserEmailKey}/withdrawals`;
 
-  // ✅ Push and Update
-  push(historyRef, request)
+  push(ref(db, `${basePath}/history`), request)
     .then(() => {
       const newBalance = availableBalance - amount;
-      update(balanceRef, { totalavailable: newBalance });
+      update(ref(db, basePath), { totalavailable: newBalance });
       alert("Withdrawal request submitted!");
       document.getElementById("withdrawAmount").value = "";
       document.getElementById("withdrawDetails").value = "";

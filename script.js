@@ -1,3 +1,4 @@
+// ✅ Firebase config and imports
 import { firebaseConfig } from "./config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -40,56 +41,80 @@ function generateZeroStats(days = 10) {
     const date = new Date(now);
     date.setDate(now.getDate() - i);
     const isoDate = date.toISOString().split("T")[0];
-    stats[isoDate] = { impressions: 0, earnings: 0, cpm: 0 };
+    stats[isoDate] = { impressions: 0, earnings: 0 };
   }
   return stats;
 }
 
-// ✅ Signup
+// ✅ Utility to make Firebase-safe keys
+function safeEmailKey(email) {
+  return email.replace(/\./g, "_");
+}
+
+// ✅ Signup Function
 window.handleSignup = async () => {
-  const nameInput = document.getElementById("signupName").value.trim();
+  const name = document.getElementById("signupName").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value;
 
-  if (!nameInput || !email || !password) {
+  if (!name || !email || !password) {
     alert("Please fill all signup fields.");
     return;
   }
 
   try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const userId = userCredential.user.uid;
+    await createUserWithEmailAndPassword(auth, email, password);
     const now = new Date().toISOString();
-    const shortName = nameInput.split(" ")[0];
+    const emailKey = safeEmailKey(email);
 
-    const defaultUserData = {
-      name: shortName,
-      email,
-      createdAt: now,
+    const userData = {
       dashboard: {
-        totalEarnings: 0,
-        todayEarnings: 0,
-        totalImpressions: 0,
-        todayImpressions: 0,
         currentCPM: 0,
+        todayEarnings: 0,
+        todayImpressions: 0,
+        totalEarnings: 0,
+        totalImpressions: 0,
         dailyStats: generateZeroStats()
       },
       withdrawals: {
         totalWithdrawn: 0,
-        history: [
-          { date: "2025-06-16", method: "UPI", amount: 0, status: "Pending" },
-          { date: "2025-06-17", method: "Bank Transfer", amount: 0, status: "Pending" },
-          { date: "2025-06-18", method: "Crypto", amount: 0, status: "Pending" }
-        ]
+        requests: {
+          "-initRequest": {
+            method: "UPI",
+            amount: 0,
+            date: now,
+            status: "pending",
+            details: {
+              upi: "init@upi"
+            }
+          }
+        }
       },
-      links: {
-        abc123: { originalUrl: "https://example1.com", views: 0, createdAt: now },
-        xyz456: { originalUrl: "https://example2.com", views: 0, createdAt: now },
-        pqr789: { originalUrl: "https://example3.com", views: 0, createdAt: now }
+      shortner: {
+        web: {
+          "initCode": {
+            originalUrl: "https://terabox.com/s/placeholder",
+            shortUrl: "https://teraboxlinke.com/a/initCode",
+            fileId: "placeholder",
+            views: 0,
+            createdAt: now
+          }
+        },
+        telegram: {
+          "initTelegram": {
+            originalUrl: "https://terabox.com/s/initTelegram",
+            shortUrl: "https://teraboxlinke.com/a/initTelegram",
+            fileId: "initTelegram",
+            telegramId: "000000",
+            views: 0,
+            createdAt: now
+          }
+        }
       }
     };
 
-    await set(ref(db, `users/${userId}`), defaultUserData);
+    await set(ref(db, `users/${emailKey}`), userData);
+
     alert("Signup successful!");
     window.location.href = "/dashboard.html";
   } catch (error) {
@@ -97,7 +122,7 @@ window.handleSignup = async () => {
   }
 };
 
-// ✅ Login
+// ✅ Login Function
 window.handleLogin = async () => {
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
@@ -108,9 +133,9 @@ window.handleLogin = async () => {
   }
 
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const userId = userCredential.user.uid;
-    const snapshot = await get(child(ref(db), `users/${userId}`));
+    await signInWithEmailAndPassword(auth, email, password);
+    const emailKey = safeEmailKey(email);
+    const snapshot = await get(child(ref(db), `users/${emailKey}`));
 
     if (snapshot.exists()) {
       localStorage.setItem("userData", JSON.stringify(snapshot.val()));
@@ -124,7 +149,7 @@ window.handleLogin = async () => {
   }
 };
 
-// ✅ Dummy Link Shortener
+// ✅ Dummy Shorten (for UI only)
 window.shortenLink = () => {
   const linkInput = document.getElementById("linkInput");
   const longURL = linkInput.value.trim();
@@ -135,7 +160,7 @@ window.shortenLink = () => {
   }
 
   const shortCode = Math.random().toString(36).substring(2, 8);
-  const shortURL = window.location.origin + "/" + shortCode;
+  const shortURL = window.location.origin + "/a/" + shortCode;
 
   linkInput.value = shortURL;
   alert("Shortened: " + shortURL);

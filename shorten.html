@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shorten Link | ShortEarn</title>
-  <link rel="stylesheet" href="dashboard.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -102,116 +101,137 @@
 </head>
 <body>
 
-  <!-- 🔐 Overlay if not logged in -->
-  <div id="loginOverlay">
-    <div>
-      <h2>Login Required</h2>
-      <p>Please login to use the shortener.</p>
-      <button onclick="window.location.href='index.html'">Login</button>
-    </div>
+<!-- 🔐 Overlay if not logged in -->
+<div id="loginOverlay">
+  <div>
+    <h2>Login Required</h2>
+    <p>Please login to use the shortener.</p>
+    <button onclick="window.location.href='index.html'">Login</button>
   </div>
+</div>
 
-  <!-- ✅ Navbar -->
-  <header class="top-navbar">
-    <div class="menu-icon" onclick="goToDashboard()">☰</div>
-    <div class="logo">ShortEarn</div>
-    <div class="profile-icon" onclick="goToProfile()">👤</div>
-  </header>
+<!-- ✅ Navbar -->
+<header class="top-navbar">
+  <div class="menu-icon" onclick="window.location.href='dashboard.html'">☰</div>
+  <div class="logo">ShortEarn</div>
+  <div class="profile-icon" onclick="window.location.href='profile.html'">👤</div>
+</header>
 
-  <!-- ✅ Shortener UI -->
-  <div class="shorten-box" id="mainContent">
-    <h2>🔗 Shorten Your Long URL</h2>
-    <input type="text" id="longUrl" placeholder="Enter your long URL here...">
-    <button onclick="shortenUrl()">Shorten</button>
-    <div id="resultBox" class="result-box"></div>
-  </div>
+<!-- ✅ Shortener UI -->
+<div class="shorten-box" id="mainContent">
+  <h2>🔗 Shorten Your Long URL</h2>
+  <input type="text" id="longUrl" placeholder="Enter your long URL here...">
+  <button onclick="shortenUrl()">Shorten</button>
+  <div id="resultBox" class="result-box"></div>
+</div>
 
-  <!-- ✅ Firebase Logic -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-    import { firebaseConfig } from "./config.js";
+<!-- ✅ Firebase + Logic -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getDatabase(app);
+// ✅ Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyAt5cUIs3fCKigH0aRZvPWBKMaxkUOH1Zk",
+  authDomain: "link-shortner-project-2aed0.firebaseapp.com",
+  databaseURL: "https://link-shortner-project-2aed0-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "link-shortner-project-2aed0",
+  storageBucket: "link-shortner-project-2aed0.appspot.com",
+  messagingSenderId: "984742490311",
+  appId: "1:984742490311:web:90c0b870b690b7dd558ee2"
+};
 
-    const loginOverlay = document.getElementById("loginOverlay");
-    const mainContent = document.getElementById("mainContent");
-    const resultBox = document.getElementById("resultBox");
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-    let currentUser = null;
+// ✅ DOM Elements
+const loginOverlay = document.getElementById("loginOverlay");
+const mainContent = document.getElementById("mainContent");
+const resultBox = document.getElementById("resultBox");
+let currentUser = null;
 
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        loginOverlay.style.display = "flex";
-        mainContent.style.filter = "blur(4px)";
-        setTimeout(() => window.location.href = "index.html", 1500);
-        return;
-      }
-      currentUser = user;
-    });
+// ✅ Safe key
+function safeEmailKey(email) {
+  return email.replace(/\./g, "_");
+}
 
-    // ✅ Extract file ID from the given URL
-    function extractFileId(url) {
-      try {
-        const parts = url.split("/");
-        return parts.pop() || parts.pop(); // handles trailing slash
-      } catch {
-        return null;
-      }
-    }
+// ✅ Auth Check
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    loginOverlay.style.display = "flex";
+    mainContent.style.filter = "blur(4px)";
+    setTimeout(() => window.location.href = "index.html", 1500);
+    return;
+  }
+  currentUser = user;
+});
 
-    // ✅ Main Shorten Logic
-    window.shortenUrl = () => {
-      const longUrl = document.getElementById("longUrl").value.trim();
-      resultBox.style.display = "none";
+// ✅ Extract File ID
+function extractFileId(url) {
+  try {
+    const parts = url.split("/");
+    return parts.pop() || parts.pop(); // handle trailing slash
+  } catch {
+    return null;
+  }
+}
 
-      if (!longUrl) {
-        resultBox.style.display = 'block';
-        resultBox.style.color = 'red';
-        resultBox.textContent = 'Please enter a valid URL.';
-        return;
-      }
+// ✅ Shorten URL Function
+window.shortenUrl = () => {
+  const longUrl = document.getElementById("longUrl").value.trim();
+  resultBox.style.display = "none";
 
-      const fileId = extractFileId(longUrl);
-      if (!fileId) {
-        resultBox.style.display = 'block';
-        resultBox.style.color = 'red';
-        resultBox.textContent = 'Could not extract file ID.';
-        return;
-      }
+  if (!longUrl.startsWith("http")) {
+    resultBox.style.display = 'block';
+    resultBox.style.color = 'red';
+    resultBox.textContent = 'Please enter a valid URL.';
+    return;
+  }
 
-      const shortUrl = `https://teraboxlinke.com/a/${fileId}`;
-      const now = new Date();
-      const today = now.toISOString().split("T")[0];
+  const fileId = extractFileId(longUrl);
+  if (!fileId) {
+    resultBox.style.display = 'block';
+    resultBox.style.color = 'red';
+    resultBox.textContent = 'Could not extract file ID.';
+    return;
+  }
 
-      const data = {
-        originalUrl: longUrl,
-        shortUrl,
-        fileId,
-        createdAt: now.toISOString(),
-        views: 0,
-        dailyViews: { [today]: 0 }
-      };
+  const shortUrl = `https://teraboxlinke.com/a/${fileId}`;
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
 
-      // Save globally
-      set(ref(db, `shortLinks/${fileId}`), data);
+  const data = {
+    originalUrl: longUrl,
+    shortUrl,
+    fileId,
+    createdAt: now.toISOString(),
+    views: 0,
+    dailyViews: { [today]: 0 }
+  };
 
-      // Save under user
-      set(ref(db, `users/${currentUser.uid}/links/${fileId}`), data);
+  const emailKey = safeEmailKey(currentUser.email);
+  const globalRef = ref(db, `shortLinks/${fileId}`);
+  const userRef = ref(db, `users/${emailKey}/shortner/web/${fileId}`);
+  const statRef = ref(db, `users/${emailKey}/dashboard/totalLinks`);
 
+  set(globalRef, data)
+    .then(() => set(userRef, data))
+    .then(() => runTransaction(statRef, (val) => (val || 0) + 1))
+    .then(() => {
       resultBox.style.display = "block";
       resultBox.style.color = "#003973";
       resultBox.innerHTML = `
         <strong>Shortened URL:</strong><br>
         <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
-    };
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again.");
+    });
+};
+</script>
 
-    // 🔄 Navigation
-    window.goToDashboard = () => window.location.href = 'dashboard.html';
-    window.goToProfile = () => window.location.href = 'profile.html';
-  </script>
 </body>
 </html>
