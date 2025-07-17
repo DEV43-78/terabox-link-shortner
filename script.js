@@ -1,5 +1,5 @@
 // ✅ Firebase config and imports
-import { firebaseConfig } from "./config.js";
+import { fetchAndDecryptConfig } from "./config.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getAuth,
@@ -14,11 +14,6 @@ import {
   child
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ✅ Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
 // ✅ Modal Toggle Functions
 window.openLogin = () => {
   document.getElementById("loginModal").classList.remove("hidden");
@@ -29,6 +24,24 @@ window.openSignup = () => {
   document.getElementById("signupModal").classList.remove("hidden");
   document.getElementById("loginModal").classList.add("hidden");
 };
+
+// ✅ Global variables for Firebase
+let auth, db;
+
+// ✅ Initialize Firebase
+async function initializeFirebase() {
+  try {
+    const firebaseConfig = await fetchAndDecryptConfig();
+    const app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getDatabase(app);
+    return true;
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
+    alert("Failed to initialize Firebase. Please check if the backend server is running.");
+    return false;
+  }
+}
 
 window.switchToSignup = () => window.openSignup();
 window.switchToLogin = () => window.openLogin();
@@ -53,6 +66,11 @@ function safeEmailKey(email) {
 
 // ✅ Signup Function
 window.handleSignup = async () => {
+  if (!auth || !db) {
+    alert("Firebase is not initialized yet. Please wait a moment and try again.");
+    return;
+  }
+
   const name = document.getElementById("signupName").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value;
@@ -124,6 +142,11 @@ window.handleSignup = async () => {
 
 // ✅ Login Function
 window.handleLogin = async () => {
+  if (!auth || !db) {
+    alert("Firebase is not initialized yet. Please wait a moment and try again.");
+    return;
+  }
+
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value;
 
@@ -167,7 +190,11 @@ window.shortenLink = () => {
 };
 
 // ✅ Register Events
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
+  // Initialize Firebase first
+  await initializeFirebase();
+  
+  // Then set up event listeners
   document.getElementById("loginBtn")?.addEventListener("click", openLogin);
   document.getElementById("signupBtn")?.addEventListener("click", openSignup);
   document.getElementById("switchToSignup")?.addEventListener("click", switchToSignup);

@@ -1,0 +1,20 @@
+{
+  "name": "terabox-link-shortner",
+  "version": "1.0.0",
+  "description": "TeraBox Link Shortener with earnings",
+  "scripts": {
+    "dev:backend": "cd backend && npm start",
+    "dev:frontend": "python -m http.server 3000",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "deploy:backend": "cd backend && vercel --prod",
+    "deploy:frontend": "vercel --prod",
+    "install:backend": "cd backend && npm install",
+    "build": "echo 'Static frontend - no build needed'"
+  },
+  "keywords": ["link-shortener", "terabox", "earnings"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

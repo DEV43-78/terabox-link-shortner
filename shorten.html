@@ -130,17 +130,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { fetchAndDecryptConfig } from "./config.js";
+
+const firebaseConfig = await fetchAndDecryptConfig();
 
 // ✅ Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyAt5cUIs3fCKigH0aRZvPWBKMaxkUOH1Zk",
-  authDomain: "link-shortner-project-2aed0.firebaseapp.com",
-  databaseURL: "https://link-shortner-project-2aed0-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "link-shortner-project-2aed0",
-  storageBucket: "link-shortner-project-2aed0.appspot.com",
-  messagingSenderId: "984742490311",
-  appId: "1:984742490311:web:90c0b870b690b7dd558ee2"
-};
+// const firebaseConfig = {
+//   apiKey: "AIzaSyAt5cUIs3fCKigH0aRZvPWBKMaxkUOH1Zk",
+//   authDomain: "link-shortner-project-2aed0.firebaseapp.com",
+//   databaseURL: "https://link-shortner-project-2aed0-default-rtdb.asia-southeast1.firebasedatabase.app",
+//   projectId: "link-shortner-project-2aed0",
+//   storageBucket: "link-shortner-project-2aed0.appspot.com",
+//   messagingSenderId: "984742490311",
+//   appId: "1:984742490311:web:90c0b870b690b7dd558ee2"
+// };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
