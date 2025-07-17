@@ -1,20 +1,14 @@
 {
-  "name": "terabox-link-shortner",
+  "name": "html-css-js-frontend",
   "version": "1.0.0",
-  "description": "TeraBox Link Shortener with earnings",
+  "description": "A simple frontend project using HTML, CSS, and JavaScript.",
   "scripts": {
-    "dev:backend": "cd backend && npm start",
-    "dev:frontend": "python -m http.server 3000",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "deploy:backend": "cd backend && vercel --prod",
-    "deploy:frontend": "vercel --prod",
-    "install:backend": "cd backend && npm install",
-    "build": "echo 'Static frontend - no build needed'"
+    "dev": "live-server --port=3000",
+    "build": "echo 'No build needed for static frontend.'"
   },
-  "keywords": ["link-shortener", "terabox", "earnings"],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
-    "concurrently": "^7.6.0"
-  }
+    "live-server": "^1.2.2"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }
