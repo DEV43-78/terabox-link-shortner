@@ -10,7 +10,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 // ✅ DOM Elements 
-const totalEarningsEl = document.getElementById("availableEarnings: 0,");
+const availableEarningsEl = document.getElementById("availableEarnings: 0,");
 const totalEarningsEl = document.getElementById("totalEarnings");
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
