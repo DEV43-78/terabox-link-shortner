@@ -37,8 +37,7 @@ function loadDashboard(emailKey) {
     const data = snapshot.val();
     if (!data) return;
 
-    availableEarnings.textContent = `₹${data.availableEarnings ?? 0}`;
-    totalEarningsEl.textContent = `₹${data.totalEarnings ?? 0}`;
+    availableEarningsE1.textContent = `₹${data.availableEarnings ?? 0}`;
     todayEarningsEl.textContent = `₹${data.todayEarnings ?? 0}`;
     impressionsEl.textContent = `${data.todayImpressions ?? data.totalImpressions ?? 0}`;
     cpmEl.textContent = `₹${data.currentCPM ?? 0}`;
