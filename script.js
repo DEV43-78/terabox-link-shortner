@@ -88,7 +88,7 @@ window.handleSignup = async () => {
     const userData = {
       dashboard: {
         currentCPM: 0,
-        todayEarnings: 0,
+        availableEarnings: 0,
         todayImpressions: 0,
         totalEarnings: 0,
         totalImpressions: 0,
@@ -96,6 +96,7 @@ window.handleSignup = async () => {
       },
       withdrawals: {
         totalWithdrawn: 0,
+        totalavailable: 0,
         requests: {
           "-initRequest": {
             method: "UPI",
