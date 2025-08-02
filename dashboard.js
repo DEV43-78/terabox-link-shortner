@@ -9,7 +9,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// ✅ DOM Elements
+// ✅ DOM Elements 
+const totalEarningsEl = document.getElementById("availableEarnings: 0,");
 const totalEarningsEl = document.getElementById("totalEarnings");
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
@@ -37,6 +38,7 @@ function loadDashboard(emailKey) {
     const data = snapshot.val();
     if (!data) return;
 
+    availableEarnings.textContent = `₹${data.availableEarnings ?? 0}`;
     totalEarningsEl.textContent = `₹${data.totalEarnings ?? 0}`;
     todayEarningsEl.textContent = `₹${data.todayEarnings ?? 0}`;
     impressionsEl.textContent = `${data.todayImpressions ?? data.totalImpressions ?? 0}`;
