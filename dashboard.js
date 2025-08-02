@@ -11,7 +11,6 @@ const db = getDatabase(app);
 
 // ✅ DOM Elements 
 const availableEarningsEl = document.getElementById("availableEarnings");
-const totalEarningsEl = document.getElementById("totalEarnings");
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
 const cpmEl = document.getElementById("currentCPM");
