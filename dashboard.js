@@ -10,7 +10,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 // ✅ DOM Elements 
-const availableEarningsEl = document.getElementById("totalEarnings"); // 🔹 Fix: सही ID
+const availableEarningsEl = document.getElementById("totalEarnings");
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
 const cpmEl = document.getElementById("currentCPM");
@@ -38,7 +38,8 @@ function loadDashboard(emailKey) {
     if (!data) return;
 
     const dailyStats = data.dailyStats || {};
-    const sortedDates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a)); // 🔹 Latest first
+    // 🔹 Dates को descending order (latest → oldest) में sort किया
+    const sortedDates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a));
 
     // 🔹 Latest Day Data for Cards
     if (sortedDates.length > 0) {
@@ -56,7 +57,7 @@ function loadDashboard(emailKey) {
       cpmEl.textContent = "₹0";
     }
 
-    // 🔹 Table with Last 10 Days (Latest → Oldest)
+    // 🔹 Table में उल्टा (latest → oldest) order
     tableBody.innerHTML = sortedDates.length === 0
       ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
       : sortedDates.slice(0, 10).map(date => {
