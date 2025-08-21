@@ -24,10 +24,22 @@ function safeEmailKey(email) {
   return email.replace(/\./g, "_");
 }
 
-// ✅ Format YYYY-MM-DD to readable
+// ✅ Format YYYY-MM-DD / Aug 10 → readable
 function formatDate(dateString) {
-  const d = new Date(dateString);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return dateString; // Firebase में वैसे ही दिखाओ (Aug 10 → Aug 19)
+}
+
+// ✅ Proper Month → Number Map
+const monthMap = {
+  Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
+  Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
+};
+
+// ✅ Custom Date Parser
+function parseCustomDate(str) {
+  // Example: "Aug 19"
+  const [mon, day] = str.split(" ");
+  return new Date(2025, monthMap[mon], parseInt(day)); // year fixed (2025)
 }
 
 // ✅ Load Dashboard Data
@@ -38,8 +50,11 @@ function loadDashboard(emailKey) {
     if (!data) return;
 
     const dailyStats = data.dailyStats || {};
-    // 🔹 Dates को descending order (latest → oldest) में sort किया
-    const sortedDates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a));
+
+    // 🔹 Dates को custom parse करके sort (latest → oldest)
+    const sortedDates = Object.keys(dailyStats).sort(
+      (a, b) => parseCustomDate(b) - parseCustomDate(a)
+    );
 
     // 🔹 Latest Day Data for Cards
     if (sortedDates.length > 0) {
@@ -57,7 +72,7 @@ function loadDashboard(emailKey) {
       cpmEl.textContent = "₹0";
     }
 
-    // 🔹 Table में सही order (latest → oldest)
+    // 🔹 Table Render (latest → oldest)
     tableBody.innerHTML = sortedDates.length === 0
       ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
       : sortedDates.slice(0, 10).map(date => {
