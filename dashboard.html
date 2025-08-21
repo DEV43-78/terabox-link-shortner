@@ -40,10 +40,14 @@
       cursor: pointer;
     }
 
-    .blurred {
-      filter: blur(5px);
-      pointer-events: none;
-    }
+    .blurred { filter: blur(5px); pointer-events: none; }
+
+    /* Table Styling */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid #ddd; }
+    thead { background: #003973; color: #fff; }
+    tbody tr:nth-child(even) { background: #f9f9f9; }
+    tbody tr:hover { background: #f1f1f1; }
   </style>
 </head>
 <body>
@@ -91,16 +95,18 @@
       <section class="tool-section">
         <h2>📅 Last 10 Days Performance</h2>
         <div style="overflow-x: auto;">
-          <table style="width:100%; border-collapse: collapse;">
-            <thead style="background: #003973; color: white;">
+          <table>
+            <thead>
               <tr>
-                <th style="padding: 10px;">Date</th>
-                <th style="padding: 10px;">Impressions</th>
-                <th style="padding: 10px;">Earnings (₹)</th>
-                <th style="padding: 10px;">CPM</th>
+                <th>Date</th>
+                <th>Impressions</th>
+                <th>Earnings (₹)</th>
+                <th>CPM</th>
               </tr>
             </thead>
-            <tbody id="dailyStatsBody" style="background: #fff;"></tbody>
+            <tbody id="dailyStatsBody">
+              <tr><td colspan="4">Loading...</td></tr>
+            </tbody>
           </table>
         </div>
       </section>
@@ -120,6 +126,7 @@
     }
   </script>
 
+  <!-- ✅ Firebase Scripts -->
   <script type="module" src="config.js"></script>
   <script type="module" src="dashboard.js"></script>
 </body>
