@@ -57,7 +57,7 @@ function loadDashboard(emailKey) {
       cpmEl.textContent = "₹0";
     }
 
-    // 🔹 Table में उल्टा (latest → oldest) order
+    // 🔹 Table में सही order (latest → oldest)
     tableBody.innerHTML = sortedDates.length === 0
       ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
       : sortedDates.slice(0, 10).map(date => {
