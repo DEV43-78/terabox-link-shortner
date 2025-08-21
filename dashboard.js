@@ -10,7 +10,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 // ✅ DOM Elements 
-const availableEarningsEl = document.getElementById("availableEarnings");
+const availableEarningsEl = document.getElementById("totalEarnings"); // 🔹 Fix: सही ID
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
 const cpmEl = document.getElementById("currentCPM");
@@ -37,26 +37,38 @@ function loadDashboard(emailKey) {
     const data = snapshot.val();
     if (!data) return;
 
-    availableEarningsE1.textContent = `₹${data.availableEarnings ?? 0}`;
-    todayEarningsEl.textContent = `₹${data.todayEarnings ?? 0}`;
-    impressionsEl.textContent = `${data.todayImpressions ?? data.totalImpressions ?? 0}`;
-    cpmEl.textContent = `₹${data.currentCPM ?? 0}`;
-
     const dailyStats = data.dailyStats || {};
-    const sortedDates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a));
+    const sortedDates = Object.keys(dailyStats).sort((a, b) => new Date(b) - new Date(a)); // 🔹 Latest first
 
+    // 🔹 Latest Day Data for Cards
+    if (sortedDates.length > 0) {
+      const latestDate = sortedDates[0];
+      const latest = dailyStats[latestDate];
+
+      availableEarningsEl.textContent = `₹${data.availableEarnings ?? latest.earnings ?? 0}`;
+      todayEarningsEl.textContent = `₹${data.todayEarnings ?? latest.earnings ?? 0}`;
+      impressionsEl.textContent = `${data.todayImpressions ?? latest.impressions ?? data.totalImpressions ?? 0}`;
+      cpmEl.textContent = `₹${data.currentCPM ?? latest.cpm ?? 0}`;
+    } else {
+      availableEarningsEl.textContent = "₹0";
+      todayEarningsEl.textContent = "₹0";
+      impressionsEl.textContent = "0";
+      cpmEl.textContent = "₹0";
+    }
+
+    // 🔹 Table with Last 10 Days (Latest → Oldest)
     tableBody.innerHTML = sortedDates.length === 0
       ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
-      : sortedDates.slice(0, 10).reverse().map(date => {
-        const stats = dailyStats[date];
-        return `
-          <tr>
-            <td>${formatDate(date)}</td>
-            <td>${stats.impressions ?? 0}</td>
-            <td>₹${stats.earnings ?? 0}</td>
-            <td>₹${stats.cpm ?? 0}</td>
-          </tr>`;
-      }).join('');
+      : sortedDates.slice(0, 10).map(date => {
+          const stats = dailyStats[date];
+          return `
+            <tr>
+              <td>${formatDate(date)}</td>
+              <td>${stats.impressions ?? 0}</td>
+              <td>₹${stats.earnings ?? 0}</td>
+              <td>₹${stats.cpm ?? 0}</td>
+            </tr>`;
+        }).join('');
   });
 }
 
