@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/shorten", "destination": "/shorten.html" },
+    { "source": "/support", "destination": "/support.html" },
+    { "source": "/telegram", "destination": "/telegram.html" },
+    { "source": "/withdraw", "destination": "/withdraw.html" }
+  ]
+}
