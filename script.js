@@ -164,7 +164,7 @@ window.handleLogin = async () => {
     if (snapshot.exists()) {
       localStorage.setItem("userData", JSON.stringify(snapshot.val()));
       alert("Login successful!");
-      window.location.href = "/dashboard.html";
+      window.location.href = "/dashboard";
     } else {
       alert("User data not found in database.");
     }
