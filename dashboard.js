@@ -9,7 +9,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// ✅ DOM Elements 
+// ✅ DOM Elements
 const availableEarningsEl = document.getElementById("totalEarnings");
 const todayEarningsEl = document.getElementById("todayEarnings");
 const impressionsEl = document.getElementById("totalImpressions");
@@ -18,45 +18,90 @@ const tableBody = document.getElementById("dailyStatsBody");
 const profileNameEl = document.getElementById("profileName");
 const loginOverlay = document.getElementById("loginOverlay");
 const mainContent = document.getElementById("mainContent");
+const paginationEl = document.getElementById("pagination");
 
-// ✅ Helper to convert email to Firebase-safe key
+// ✅ Helpers
 function safeEmailKey(email) {
   return email.replace(/\./g, "_");
 }
 
-// ✅ Format YYYY-MM-DD / Aug 10 → readable
-function formatDate(dateString) {
-  return dateString; // Firebase में वैसे ही दिखाओ (Aug 10 → Aug 19)
-}
-
-// ✅ Proper Month → Number Map
+// 🔹 Month mapping for custom Firebase date format ("Aug 19")
 const monthMap = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
   Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11
 };
-
-// ✅ Custom Date Parser
 function parseCustomDate(str) {
-  // Example: "Aug 19"
   const [mon, day] = str.split(" ");
-  return new Date(2025, monthMap[mon], parseInt(day)); // year fixed (2025)
+  return new Date(2025, monthMap[mon], parseInt(day)); // Fixed year = 2025
 }
 
-// ✅ Load Dashboard Data
+// ✅ Globals
+let sortedDates = [];
+let dailyStats = {};
+let currentPage = 1;
+const rowsPerPage = 15;
+
+// ✅ Render Table
+function renderTable(page) {
+  const start = (page - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const pageDates = sortedDates.slice(start, end);
+
+  tableBody.innerHTML = pageDates.length === 0
+    ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
+    : pageDates.map(date => {
+        const stats = dailyStats[date] || {};
+        return `
+          <tr>
+            <td>${date}</td>
+            <td>${stats.impressions ?? 0}</td>
+            <td>₹${stats.earnings ?? 0}</td>
+            <td>₹${stats.cpm ?? 0}</td>
+          </tr>`;
+      }).join('');
+
+  renderPagination();
+}
+
+// ✅ Render Pagination Buttons
+function renderPagination() {
+  const totalPages = Math.ceil(sortedDates.length / rowsPerPage);
+  paginationEl.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  let buttons = `<button ${currentPage===1?"disabled":""} onclick="changePage(${currentPage-1})">⬅ Prev</button>`;
+
+  for (let i = 1; i <= totalPages; i++) {
+    buttons += `<button class="${i===currentPage?"active":""}" onclick="changePage(${i})">${i}</button>`;
+  }
+
+  buttons += `<button ${currentPage===totalPages?"disabled":""} onclick="changePage(${currentPage+1})">Next ➡</button>`;
+
+  paginationEl.innerHTML = buttons;
+}
+
+window.changePage = function (page) {
+  const totalPages = Math.ceil(sortedDates.length / rowsPerPage);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderTable(currentPage);
+};
+
+// ✅ Load Dashboard
 function loadDashboard(emailKey) {
   const dashboardRef = ref(db, `users/${emailKey}/dashboard`);
   onValue(dashboardRef, (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
 
-    const dailyStats = data.dailyStats || {};
+    dailyStats = data.dailyStats || {};
 
-    // 🔹 Dates को custom parse करके sort (latest → oldest)
-    const sortedDates = Object.keys(dailyStats).sort(
-      (a, b) => parseCustomDate(b) - parseCustomDate(a)
-    );
+    // 🔹 Dates ko parse karke sort (latest → oldest) aur 120 limit
+    sortedDates = Object.keys(dailyStats)
+      .sort((a, b) => parseCustomDate(b) - parseCustomDate(a))
+      .slice(0, 120);
 
-    // 🔹 Latest Day Data for Cards
+    // 🔹 Update cards using latest date
     if (sortedDates.length > 0) {
       const latestDate = sortedDates[0];
       const latest = dailyStats[latestDate];
@@ -72,32 +117,20 @@ function loadDashboard(emailKey) {
       cpmEl.textContent = "₹0";
     }
 
-    // 🔹 Table Render (latest → oldest)
-    tableBody.innerHTML = sortedDates.length === 0
-      ? `<tr><td colspan="4" style="text-align:center;">No stats available</td></tr>`
-      : sortedDates.slice(0, 10).map(date => {
-          const stats = dailyStats[date];
-          return `
-            <tr>
-              <td>${formatDate(date)}</td>
-              <td>${stats.impressions ?? 0}</td>
-              <td>₹${stats.earnings ?? 0}</td>
-              <td>₹${stats.cpm ?? 0}</td>
-            </tr>`;
-        }).join('');
+    // 🔹 Show first page
+    currentPage = 1;
+    renderTable(currentPage);
   });
 }
 
-// ✅ Load Profile Name
+// ✅ Profile Name
 function loadUserProfile(emailKey) {
   onValue(ref(db, `users/${emailKey}/name`), (snap) => {
-    if (snap.exists()) {
-      profileNameEl.textContent = snap.val();
-    }
+    if (snap.exists()) profileNameEl.textContent = snap.val();
   });
 }
 
-// ✅ Auth State Check
+// ✅ Auth State
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     loginOverlay.style.display = "flex";
@@ -105,7 +138,6 @@ onAuthStateChanged(auth, (user) => {
     setTimeout(() => window.location.href = "index.html", 2000);
     return;
   }
-
   const emailKey = safeEmailKey(user.email);
   loadDashboard(emailKey);
   loadUserProfile(emailKey);
@@ -113,12 +145,8 @@ onAuthStateChanged(auth, (user) => {
 
 // ✅ Logout
 window.handleLogout = () => {
-  signOut(auth)
-    .then(() => {
-      localStorage.clear();
-      window.location.href = "index.html";
-    })
-    .catch((err) => {
-      alert("Logout error: " + err.message);
-    });
+  signOut(auth).then(() => {
+    localStorage.clear();
+    window.location.href = "index.html";
+  }).catch((err) => alert("Logout error: " + err.message));
 };
