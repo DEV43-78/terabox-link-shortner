@@ -5,72 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard | ShortEarn</title>
   <link rel="stylesheet" href="dashboard.css" />
-  <style>
-    .menu-icon, .profile-icon { cursor: pointer; }
-    #sidebar { transform: translateX(0); transition: transform 0.3s ease; }
-    #sidebar.hidden { transform: translateX(-100%); }
-    .nav-items li { cursor: pointer; }
-
-    #loginOverlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #loginModal {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-      max-width: 300px;
-    }
-
-    #loginModal h2 { margin-bottom: 20px; }
-
-    #loginModal button {
-      background-color: #003973;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .blurred { filter: blur(5px); pointer-events: none; }
-
-    /* Table Styling */
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; text-align: center; border-bottom: 1px solid #ddd; }
-    thead { background: #003973; color: #fff; }
-    tbody tr:nth-child(even) { background: #f9f9f9; }
-    tbody tr:hover { background: #f1f1f1; }
-
-    /* Pagination */
-    #pagination { margin-top: 15px; text-align: center; }
-    #pagination button {
-      margin: 0 3px;
-      padding: 6px 12px;
-      border: 1px solid #003973;
-      background: #fff;
-      color: #003973;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #pagination button.active {
-      background: #003973;
-      color: #fff;
-      font-weight: bold;
-    }
-    #pagination button:disabled {
-      background: #ccc;
-      color: #666;
-      cursor: not-allowed;
-    }
-  </style>
+ 
 </head>
 <body>
   <!-- 🔒 Login Overlay -->
